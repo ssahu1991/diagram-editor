@@ -102,7 +102,7 @@
     const dots = s.gridStyle === 'dots';
     // the factory-default grid colour adapts to the theme; a user-picked colour is used as-is
     const isDefault = /^#e8e8e8$/i.test(s.gridColor);
-    const color = (isDefault && App.theme === 'dark') ? '#33353c' : s.gridColor;
+    const color = (isDefault && App.theme === 'dark') ? '#3e424b' : s.gridColor;
     App.dom.gridPattern.setAttribute('width', g);
     App.dom.gridPattern.setAttribute('height', g);
     App.dom.gridPath.setAttribute('d', 'M ' + g + ' 0 L 0 0 L 0 ' + g);
