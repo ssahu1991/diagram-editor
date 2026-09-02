@@ -291,6 +291,7 @@ button{font-family:inherit;color:inherit}
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:12px;pointer-events:none;user-select:none;color:var(--text-3);text-align:center;
 }
+.canvas-empty[hidden]{display:none}   /* the [hidden] attr must beat display:flex above */
 .canvas-empty svg{width:110px;height:70px;opacity:.45;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linejoin:round}
 .canvas-empty .ce-title{font-size:15px;font-weight:600;color:var(--text-2);letter-spacing:.2px}
 .canvas-empty .ce-sub{font-size:12px}
