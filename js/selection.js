@@ -179,16 +179,85 @@
     set('p-rot', Math.round(n.rotation || 0));
   };
 
+  /* ---------------- smart alignment guides ---------------- */
+  function clearGuides() {
+    App.dom.layerTmp.querySelectorAll('line.guide').forEach(l => l.remove());
+  }
+  // for a single node moving to (x,y): snap its edges/centre to nearby nodes,
+  // returns { ax, ay } nudge and draws pink guide lines
+  function smartSnap(m, x, y) {
+    const th = 7 / App.settings.zoom;
+    const edgesX = e => [e.x, e.x + e.w / 2, e.x + e.w];
+    const edgesY = e => [e.y, e.y + e.h / 2, e.y + e.h];
+    const M = { x: x, y: y, w: m.width, h: m.height };
+    const mX = edgesX(M), mY = edgesY(M);
+    let bx = th, ax = 0, by = th, ay = 0;
+    App.nodes.forEach(o => {
+      if (o.id === m.id) return;
+      const O = { x: o.x, y: o.y, w: o.width, h: o.height };
+      edgesX(O).forEach(ox => mX.forEach(mx => { const d = Math.abs(mx - ox); if (d < bx) { bx = d; ax = ox - mx; } }));
+      edgesY(O).forEach(oy => mY.forEach(my => { const d = Math.abs(my - oy); if (d < by) { by = d; ay = oy - my; } }));
+    });
+    ax = bx < th ? ax : 0;
+    ay = by < th ? ay : 0;
+    // draw a line wherever an edge now lines up exactly
+    clearGuides();
+    const fX = edgesX({ x: x + ax, w: m.width }), fY = edgesY({ y: y + ay, h: m.height });
+    const sw = 1 / App.settings.zoom, seen = {};
+    App.nodes.forEach(o => {
+      if (o.id === m.id) return;
+      const O = { x: o.x, y: o.y, w: o.width, h: o.height };
+      edgesX(O).forEach(ox => fX.forEach(mx => {
+        if (Math.abs(mx - ox) < 0.5 && !seen['v' + ox.toFixed(1)]) {
+          seen['v' + ox.toFixed(1)] = 1;
+          App.make('line', { class: 'guide', x1: ox, x2: ox,
+            y1: Math.min(y + ay, o.y) - 12 * sw, y2: Math.max(y + ay + m.height, o.y + o.height) + 12 * sw,
+            'stroke-width': sw }, App.dom.layerTmp);
+        }
+      }));
+      edgesY(O).forEach(oy => fY.forEach(my => {
+        if (Math.abs(my - oy) < 0.5 && !seen['h' + oy.toFixed(1)]) {
+          seen['h' + oy.toFixed(1)] = 1;
+          App.make('line', { class: 'guide', y1: oy, y2: oy,
+            x1: Math.min(x + ax, o.x) - 12 * sw, x2: Math.max(x + ax + m.width, o.x + o.width) + 12 * sw,
+            'stroke-width': sw }, App.dom.layerTmp);
+        }
+      }));
+    });
+    return { ax: ax, ay: ay };
+  }
+
   /* ---------------- node dragging ---------------- */
   function startNodeDrag(e) {
     const o = App.screenToWorld(e.clientX, e.clientY);
     nd = {
       sx: o.x, sy: o.y, moved: false,
+      dup: !!e.altKey, dupDone: false,
       items: App.selectedNodes.map(id => {
         const n = App.getNode(id);
         return { n: n, x0: n.x, y0: n.y };
       })
     };
+  }
+
+  // Alt-drag: peel off a copy of the selection on first movement
+  function duplicateForDrag() {
+    const ids = nd.items.map(it => it.n.id);
+    const inSel = id => ids.indexOf(id) >= 0;
+    const map = {}, newNodes = [], newEdges = [];
+    App.nodes.filter(n => inSel(n.id)).forEach(n => {
+      const c = App.clone(n); c.id = App.uid('node'); map[n.id] = c.id; newNodes.push(c);
+    });
+    App.edges.filter(ed => inSel(ed.source) && inSel(ed.target)).forEach(ed => {
+      const c = App.clone(ed); c.id = App.uid('edge');
+      c.source = map[ed.source]; c.target = map[ed.target]; newEdges.push(c);
+    });
+    App.nodes = App.nodes.concat(newNodes);
+    App.edges = App.edges.concat(newEdges);
+    App.renderAllNodes(); App.renderAllEdges();
+    App.selectedNodes = newNodes.map(n => n.id);
+    App.refreshSelectionClasses(); App.updateSelectionOverlay();
+    nd.items = newNodes.map(n => ({ n: n, x0: n.x, y0: n.y }));
   }
 
   function doMove(cx, cy) {
@@ -200,16 +269,30 @@
         dx = App.snap(prim.x0 + dx) - prim.x0;
         dy = App.snap(prim.y0 + dy) - prim.y0;
       }
-      if (Math.abs(dx) + Math.abs(dy) > 0.4) nd.moved = true;
-      const ids = {};
-      nd.items.forEach(it => {
-        it.n.x = it.x0 + dx;
-        it.n.y = it.y0 + dy;
-        App.updateNodeTransform(it.n);   // transform attr only — no DOM rebuild
-        ids[it.n.id] = 1;
-      });
-      App.edges.forEach(ed => { if (ids[ed.source] || ids[ed.target]) App.renderEdge(ed); });
-      App.updateOverlayTransforms();     // reposition handles without rebuilding them
+      if (!nd.moved && Math.abs(dx) + Math.abs(dy) > 0.4) {
+        nd.moved = true;
+        if (nd.dup && !nd.dupDone) { nd.dupDone = true; duplicateForDrag(); }
+      }
+      if (nd.items.length === 1) {
+        const it = nd.items[0];
+        let nx = it.x0 + dx, ny = it.y0 + dy;
+        const g = smartSnap(it.n, nx, ny);
+        nx += g.ax; ny += g.ay;
+        it.n.x = nx; it.n.y = ny;
+        App.updateNodeTransform(it.n);
+        App.edges.forEach(ed => { if (ed.source === it.n.id || ed.target === it.n.id) App.renderEdge(ed); });
+        App.hud(Math.round(it.n.x) + ', ' + Math.round(it.n.y), cx, cy);
+      } else {
+        clearGuides();
+        const ids = {};
+        nd.items.forEach(it => {
+          it.n.x = it.x0 + dx; it.n.y = it.y0 + dy;
+          App.updateNodeTransform(it.n);
+          ids[it.n.id] = 1;
+        });
+        App.edges.forEach(ed => { if (ids[ed.source] || ids[ed.target]) App.renderEdge(ed); });
+      }
+      App.updateOverlayTransforms();
       App.syncFields();
     } else if (rubber) {
       const p = App.screenToWorld(cx, cy);
@@ -226,6 +309,8 @@
 
   function onMouseUp() {
     moveThrottled.flush();   // land exactly where the mouse was released
+    clearGuides();
+    App.hud(null);
     if (nd) {
       if (nd.moved) { App.updateSelectionOverlay(); App.updateProperties(); App.pushHistory(); }
       nd = null;
@@ -291,6 +376,10 @@
       const id = this.parentNode.getAttribute('data-id');
       App.selectEdge(id, e.shiftKey || e.ctrlKey || e.metaKey);
       App.updateProperties();
+    });
+    $edges.on('dblclick', 'path.edge-hit', function (e) {
+      e.stopPropagation();
+      App.editEdgeLabel(this.parentNode.getAttribute('data-id'));
     });
 
     $svg.on('mousedown', function (e) {

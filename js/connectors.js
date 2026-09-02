@@ -90,6 +90,7 @@
       sourceAnchor: sAnchor || 'auto',
       targetAnchor: tAnchor || 'auto',
       type: opts.type || App.defaultEdgeType,
+      text: '',
       style: Object.assign(App.edgeDefaultStyle(), opts.style || {})
     };
     App.edges.push(ed);
@@ -108,7 +109,7 @@
     const sel = App.selectedEdges.indexOf(edge.id) >= 0;
     const st = edge.style;
     App.make('path', { class: 'edge-hit', d: d, fill: 'none', stroke: 'transparent', 'stroke-width': 14 }, g);
-    App.make('path', {
+    const line = App.make('path', {
       class: 'edge-line', d: d, fill: 'none',
       stroke: sel ? '#2b7de9' : st.stroke,
       'stroke-width': (st.strokeWidth || 2) + (sel ? 1 : 0),
@@ -116,8 +117,69 @@
       'marker-end': st.arrowEnd ? 'url(#arrow)' : null,
       'marker-start': st.arrowStart ? 'url(#arrow)' : null
     }, g);
+
+    // optional edge label at the path midpoint (double-click an edge to add one)
+    if (edge.text && String(edge.text).trim()) {
+      let mid = null;
+      try { const L = line.getTotalLength(); if (L) mid = line.getPointAtLength(L / 2); } catch (e) {}
+      if (mid) {
+        const t = App.make('text', {
+          class: 'edge-label', x: mid.x, y: mid.y,
+          'text-anchor': 'middle', 'dominant-baseline': 'middle'
+        }, g);
+        t.textContent = edge.text;
+        try {
+          const bb = t.getBBox();
+          const r = App.make('rect', {
+            class: 'edge-label-bg', x: bb.x - 4, y: bb.y - 1,
+            width: bb.width + 8, height: bb.height + 2, rx: 3
+          });
+          g.insertBefore(r, t);
+        } catch (e) {}
+      }
+    }
     g.classList.toggle('selected', sel);
     return g;
+  };
+
+  // double-click an edge -> inline label editor
+  App.editEdgeLabel = function (id) {
+    const ed = App.getEdge(id);
+    if (!ed) return;
+    const line = App.dom.layerEdges.querySelector('g.edge[data-id="' + id + '"] path.edge-line');
+    let mid = { x: 0, y: 0 };
+    try { const L = line.getTotalLength(); const p = line.getPointAtLength(L / 2); mid = { x: p.x, y: p.y }; } catch (e) {}
+    const scr = App.worldToScreen(mid.x, mid.y);
+    let ta = document.getElementById('text-editor');
+    if (!ta) { ta = document.createElement('textarea'); ta.id = 'text-editor'; document.body.appendChild(ta); }
+    ta.style.display = 'block';
+    ta.style.left = (scr.x - 65) + 'px';
+    ta.style.top = (scr.y - 13) + 'px';
+    ta.style.width = '130px';
+    ta.style.height = '24px';
+    ta.style.fontSize = '12px';
+    ta.style.fontFamily = '';
+    ta.style.textAlign = 'center';
+    ta.placeholder = 'Label…';
+    ta.value = ed.text || '';
+    ta.focus();
+    ta.select();
+    function fin(commit) {
+      ta.style.display = 'none';
+      ta.onblur = null; ta.onkeydown = null;
+      if (commit && ta.value !== (ed.text || '')) {
+        ed.text = ta.value;
+        App.renderEdge(ed);
+        App.updateProperties();
+        App.pushHistory();
+      }
+    }
+    ta.onblur = function () { fin(true); };
+    ta.onkeydown = function (e) {
+      e.stopPropagation();
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); fin(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); fin(false); }
+    };
   };
 
   App.renderAllEdges = function () {

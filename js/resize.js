@@ -104,6 +104,7 @@
         App.refreshConnectedEdges(n.id);
         App.updateSelectionOverlay();
         App.syncFields();
+        App.hud(Math.round(n.width) + '  ×  ' + Math.round(n.height), cx, cy);
       } else if (rot) {
         const n = rot.n;
         const c = App.worldToScreen(n.x + n.width / 2, n.y + n.height / 2);
@@ -114,6 +115,7 @@
         App.refreshConnectedEdges(n.id);
         App.updateSelectionOverlay();
         App.syncFields();
+        App.hud(((n.rotation % 360) + 360) % 360 + '°', cx, cy);
       }
     }
     const dragThrottled = App.rafThrottle(doDrag);
@@ -125,6 +127,7 @@
 
     $(document).on('mouseup.resize', function () {
       dragThrottled.flush();   // apply the final frame before committing
+      App.hud(null);
       if (vtx) { vtx = null; App.updateProperties(); App.pushHistory(); }
       if (rs) { rs = null; App.updateProperties(); App.pushHistory(); }
       if (rot) { rot = null; App.updateProperties(); App.pushHistory(); }

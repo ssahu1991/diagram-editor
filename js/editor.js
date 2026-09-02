@@ -209,6 +209,17 @@
     App.updateViewport();
   };
 
+  /* ---------- floating HUD (size / angle / position readout) ---------- */
+  App.hud = function (text, cx, cy) {
+    let h = document.getElementById('hud');
+    if (!h) { h = document.createElement('div'); h.id = 'hud'; document.body.appendChild(h); }
+    if (text == null) { h.style.display = 'none'; return; }
+    h.textContent = text;
+    h.style.display = 'block';
+    h.style.left = (cx + 16) + 'px';
+    h.style.top = (cy + 18) + 'px';
+  };
+
   /* ---------- theme ---------- */
   App.theme = 'light';
   App.setTheme = function (theme, save) {

@@ -131,6 +131,7 @@
   }
   function editSelectedText() {
     if (App.selectedNodes.length === 1) App.editNodeText(App.selectedNodes[0]);
+    else if (App.selectedEdges.length === 1) App.editEdgeLabel(App.selectedEdges[0]);
   }
   function toggleEditPoints() {
     if (App.selectedNodes.length !== 1) return;
@@ -364,6 +365,11 @@
       this.value = '';
     });
 
+    /* status-bar quick toggles */
+    $('#sb-grid').attr('title', 'Toggle grid').on('click', toggleGrid);
+    $('#sb-snap').attr('title', 'Toggle snap').on('click', toggleSnap);
+    $('#sb-zoom').attr('title', 'Reset zoom').on('click', function () { App.resetZoom(); });
+
     /* keyboard */
     $(document).on('keydown', function (e) {
       if (isEditingText()) return;
@@ -383,6 +389,14 @@
       else if (ctrl && (k === '=' || k === '+')) { e.preventDefault(); App.setZoom(App.settings.zoom * 1.2); }
       else if (ctrl && k === '-') { e.preventDefault(); App.setZoom(App.settings.zoom / 1.2); }
       else if (k === 'delete' || k === 'backspace') { e.preventDefault(); deleteSelection(); }
+      else if (!ctrl && !e.altKey && k === 'v') { App.setTool('select'); }
+      else if (!ctrl && !e.altKey && k === 'c') { App.setTool('connector'); }
+      else if (!ctrl && !e.altKey && k === 't') { App.setTool('text'); }
+      else if (!ctrl && !e.altKey && (k === 'f2' || k === 'enter')) {
+        e.preventDefault();
+        if (App.selectedNodes.length === 1) App.editNodeText(App.selectedNodes[0]);
+        else if (App.selectedEdges.length === 1) App.editEdgeLabel(App.selectedEdges[0]);
+      }
       else if (k === 'escape') {
         App.hideContextMenu();
         $('.modal').removeClass('show');

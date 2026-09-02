@@ -247,8 +247,8 @@ button{font-family:inherit;color:inherit}
 .shape-grid{display:flex;flex-wrap:wrap;gap:4px;padding:8px}
 .shape-tile{
   position:relative;
-  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
-  padding:6px;border:1px solid transparent;border-radius:var(--radius);
+  width:36px;height:35px;display:flex;align-items:center;justify-content:center;
+  padding:5px;border:1px solid transparent;border-radius:var(--radius);
   background:var(--surface-2);cursor:grab;user-select:none;
   transition:background var(--t),border-color var(--t),box-shadow var(--t),transform var(--t);
 }
@@ -306,6 +306,18 @@ button{font-family:inherit;color:inherit}
 .edge-line{pointer-events:none}
 .tmp-edge{stroke:var(--conn);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
 .rubber{fill:rgba(37,99,235,.10);stroke:var(--sel);stroke-dasharray:3 2;stroke-width:1;pointer-events:none}
+.guide{stroke:#f0508a;pointer-events:none;shape-rendering:crispEdges}
+.edge-label{font:11px var(--font);fill:#21242b;pointer-events:none}
+.edge-label-bg{fill:#fff;opacity:.92;pointer-events:none}
+
+/* floating readout during resize / rotate / drag */
+#hud{
+  position:fixed;z-index:850;display:none;pointer-events:none;
+  background:var(--text);color:var(--bg);
+  font:11px/1 ui-monospace,Menlo,Consolas,monospace;
+  padding:4px 8px;border-radius:5px;box-shadow:var(--sh-2);
+}
+:root[data-theme="dark"] #hud{background:#3a3d44;color:#f2f3f5;border:1px solid var(--border-strong)}
 
 /* ============ Format (right) panel ============ */
 .fmt-tabs{
@@ -407,6 +419,8 @@ button{font-family:inherit;color:inherit}
 .statusbar .sb-div{width:1px;height:13px;background:var(--border)}
 .statusbar .sb-flex{flex:1}
 .sb-hint{color:var(--text-3)}
+#sb-grid,#sb-snap,#sb-zoom{cursor:pointer;border-radius:4px;padding:2px 5px;transition:background var(--t)}
+#sb-grid:hover,#sb-snap:hover,#sb-zoom:hover{background:var(--surface-3);color:var(--text)}
 
 /* ============ Context menu ============ */
 .context-menu{

@@ -91,7 +91,13 @@
       } else {
         const ed = App.getEdge(App.selectedEdges[0]);
         if (!ed) return;
-        if (tab === 'text') $b.html(section('Text', '<div class="prop-hint">Connectors have no text label in this build.</div>'));
+        if (tab === 'text') {
+          $b.html(section('Label',
+            '<textarea id="e-text" rows="2" placeholder="Connector label…">' + App.escapeHTML(ed.text || '') + '</textarea>' +
+            '<div class="prop-hint">Tip: double-click a connector on the canvas to edit its label.</div>'));
+          $('#e-text').on('input', function () { ed.text = this.value; App.renderEdge(ed); })
+                     .on('change', function () { App.pushHistory(); });
+        }
         else if (tab === 'arrange') { $b.html(edgeArrange()); $('#prop-body [data-cmd]').on('click', function () { App.run($(this).data('cmd')); }); }
         else { $b.html(edgeStyle(ed)); bindEdge(ed); }
       }
