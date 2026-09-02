@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagram Editor</title>
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= TOP MENU ================= -->
+  <div class="menubar" id="menubar">
+    <div class="brand">◆ Diagram<span>Editor</span></div>
+
+    <div class="menu-item" data-menu="file"><span>File</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="new">New<span class="mi-key">Ctrl+Alt+N</span></div>
+        <div class="mi" data-cmd="open">Open Diagram…<span class="mi-key">Ctrl+O</span></div>
+        <div class="mi" data-cmd="save">Save<span class="mi-key">Ctrl+S</span></div>
+        <div class="mi-sep"></div>
+        <div class="mi-label">Save As</div>
+        <div class="mi" data-cmd="exportJSON">JSON File (.json)</div>
+        <div class="mi" data-cmd="exportPNG">Editable Bitmap Image (.png)</div>
+        <div class="mi" data-cmd="exportSVG">Editable Vector Image (.svg)</div>
+        <div class="mi" data-cmd="exportHTML">HTML File (.html)</div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="deleteDiagram">Delete Saved Diagram</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-menu="edit"><span>Edit</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="undo">Undo<span class="mi-key">Ctrl+Z</span></div>
+        <div class="mi" data-cmd="redo">Redo<span class="mi-key">Ctrl+Y</span></div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="cut">Cut<span class="mi-key">Ctrl+X</span></div>
+        <div class="mi" data-cmd="copy">Copy<span class="mi-key">Ctrl+C</span></div>
+        <div class="mi" data-cmd="paste">Paste<span class="mi-key">Ctrl+V</span></div>
+        <div class="mi" data-cmd="duplicate">Duplicate<span class="mi-key">Ctrl+D</span></div>
+        <div class="mi" data-cmd="deleteSelection">Delete<span class="mi-key">Del</span></div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="selectAll">Select All<span class="mi-key">Ctrl+A</span></div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-menu="view"><span>View</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="zoomIn">Zoom In<span class="mi-key">Ctrl++</span></div>
+        <div class="mi" data-cmd="zoomOut">Zoom Out<span class="mi-key">Ctrl+-</span></div>
+        <div class="mi" data-cmd="resetZoom">Reset Zoom<span class="mi-key">Ctrl+0</span></div>
+        <div class="mi" data-cmd="fit">Fit to Screen<span class="mi-key">Ctrl+Shift+H</span></div>
+        <div class="mi-sep"></div>
+        <div class="mi check" data-cmd="toggleGrid">Grid</div>
+        <div class="mi check" data-cmd="toggleSnap">Snap to Grid</div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="fullscreen">Full Screen<span class="mi-key">F11</span></div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-menu="arrange"><span>Arrange</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="bringFront">Bring to Front</div>
+        <div class="mi" data-cmd="sendBack">Send to Back</div>
+        <div class="mi" data-cmd="bringForward">Bring Forward</div>
+        <div class="mi" data-cmd="sendBackward">Send Backward</div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="alignLeft">Align Left</div>
+        <div class="mi" data-cmd="alignCenterH">Align Center</div>
+        <div class="mi" data-cmd="alignRight">Align Right</div>
+        <div class="mi" data-cmd="alignTop">Align Top</div>
+        <div class="mi" data-cmd="alignMiddle">Align Middle</div>
+        <div class="mi" data-cmd="alignBottom">Align Bottom</div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="group">Group</div>
+        <div class="mi" data-cmd="ungroup">Ungroup</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-menu="extras"><span>Extras</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="newShape">New Shape…</div>
+        <div class="mi-sep"></div>
+        <div class="mi" data-cmd="preferences">Preferences…</div>
+        <div class="mi" data-cmd="shortcuts">Keyboard Shortcuts</div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-menu="help"><span>Help</span>
+      <div class="menu-dropdown">
+        <div class="mi" data-cmd="about">About</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOOLBAR ================= -->
+  <div class="toolbar" id="toolbar">
+    <div class="tb-group">
+      <button class="tool-btn" data-cmd="new" title="New (Ctrl+Alt+N)">
+        <svg viewBox="0 0 18 18"><path d="M4 2h7l3 3v11H4z"/><path d="M11 2v3h3"/></svg></button>
+      <button class="tool-btn" data-cmd="open" title="Open (Ctrl+O)">
+        <svg viewBox="0 0 18 18"><path d="M2 5h5l1.5 2H16v8H2z"/></svg></button>
+      <button class="tool-btn" data-cmd="save" title="Save (Ctrl+S)">
+        <svg viewBox="0 0 18 18"><path d="M3 3h9l3 3v9H3z"/><path d="M6 3v4h5V3M6 15v-4h6v4"/></svg></button>
+    </div>
+    <div class="tb-group">
+      <button class="tool-btn" data-cmd="undo" title="Undo (Ctrl+Z)">
+        <svg viewBox="0 0 18 18"><path d="M6 5L2 8l4 3"/><path d="M2 8h9a5 5 0 0 1 0 10H7"/></svg></button>
+      <button class="tool-btn" data-cmd="redo" title="Redo (Ctrl+Y)">
+        <svg viewBox="0 0 18 18"><path d="M12 5l4 3-4 3"/><path d="M16 8H7a5 5 0 0 0 0 10h4"/></svg></button>
+    </div>
+    <div class="tb-group">
+      <button class="tool-btn" data-tool="select" title="Select tool">
+        <svg viewBox="0 0 18 18"><path d="M4 3l10 5-4 1.5L8.5 14z"/></svg></button>
+      <button class="tool-btn" data-tool="connector" title="Connection tool">
+        <svg viewBox="0 0 18 18"><circle cx="4" cy="14" r="2"/><circle cx="14" cy="4" r="2"/><path d="M5.5 12.5l7-7"/></svg></button>
+      <button class="tool-btn" data-tool="text" title="Text tool">
+        <svg viewBox="0 0 18 18"><path d="M3 4h12M9 4v11"/></svg></button>
+    </div>
+    <div class="tb-group">
+      <button class="tool-btn" data-cmd="bringFront" title="To Front">
+        <svg viewBox="0 0 18 18"><rect x="3" y="3" width="9" height="9"/><rect x="7" y="7" width="8" height="8" fill="#fff"/></svg></button>
+      <button class="tool-btn" data-cmd="sendBack" title="To Back">
+        <svg viewBox="0 0 18 18"><rect x="6" y="6" width="9" height="9"/><rect x="3" y="3" width="8" height="8" fill="#fff"/></svg></button>
+    </div>
+    <div class="tb-group">
+      <button class="tool-btn danger" data-cmd="deleteSelection" title="Delete (Del)">
+        <svg viewBox="0 0 18 18"><path d="M4 5h10M7 5V3h4v2M5 5l1 10h6l1-10"/></svg></button>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-group">
+      <button class="tool-btn" id="tb-grid-toggle" data-cmd="toggleGrid" title="Show/Hide Grid">
+        <svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14"/><path d="M2 6.7h14M2 11.3h14M6.7 2v14M11.3 2v14"/></svg></button>
+      <button class="tool-btn" id="tb-snap-toggle" data-cmd="toggleSnap" title="Snap to Grid">
+        <svg viewBox="0 0 18 18"><path d="M9 2v3M9 13v3M2 9h3M13 9h3"/><circle cx="9" cy="9" r="2.4"/></svg></button>
+    </div>
+    <div class="tb-zoom">
+      <button class="tool-btn" data-cmd="zoomOut" title="Zoom Out (Ctrl+-)">
+        <svg viewBox="0 0 18 18"><path d="M4 9h10"/></svg></button>
+      <button id="zoom-pill" title="Reset zoom to 100%">100%</button>
+      <button class="tool-btn" data-cmd="zoomIn" title="Zoom In (Ctrl++)">
+        <svg viewBox="0 0 18 18"><path d="M9 4v10M4 9h10"/></svg></button>
+      <button class="tool-btn" data-cmd="fit" title="Fit page (Ctrl+Shift+H)">
+        <svg viewBox="0 0 18 18"><path d="M3 6V3h3M15 6V3h-3M3 12v3h3M15 12v3h-3"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ================= WORKSPACE ================= -->
+  <div class="workspace">
+
+    <!-- LEFT SHAPE LIBRARY -->
+    <aside class="left-panel" id="left-panel">
+      <div class="panel-head">
+        <span>Shapes</span>
+        <span style="flex:1"></span>
+        <button class="icon-btn" id="new-shape-btn" title="Create a new shape">+</button>
+        <button class="icon-btn" id="collapse-left" title="Collapse">‹</button>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="shape-search" placeholder="Search shapes…" autocomplete="off">
+      </div>
+      <div class="shape-list" id="shape-list"></div>
+    </aside>
+    <button class="panel-reopen left" id="reopen-left" title="Show shapes">›</button>
+
+    <!-- CENTER CANVAS -->
+    <div class="canvas-wrap" id="canvas-wrap">
+      <svg id="canvas" data-tool="select" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
+            <path id="grid-path" d="M 20 0 L 0 0 L 0 20" fill="none" stroke="#e8e8e8" stroke-width="1" vector-effect="non-scaling-stroke"/>
+            <circle id="grid-dot" cx="0" cy="0" r="1.1" fill="#d3d3d3" style="display:none"/>
+          </pattern>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+          </marker>
+        </defs>
+        <g id="viewport">
+          <rect id="canvas-bg" x="0" y="0" width="5000" height="4000" fill="#ffffff"/>
+          <rect id="grid-rect" x="0" y="0" width="5000" height="4000" fill="url(#grid-pattern)"/>
+          <g id="layer-edges"></g>
+          <g id="layer-nodes"></g>
+          <g id="layer-overlay"></g>
+          <g id="layer-tmp"></g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- RIGHT FORMAT PANEL -->
+    <aside class="right-panel" id="right-panel">
+      <div class="fmt-tabs">
+        <button class="fmt-tab active" data-tab="style">Style</button>
+        <button class="fmt-tab" data-tab="text">Text</button>
+        <button class="fmt-tab" data-tab="arrange">Arrange</button>
+        <button class="icon-btn fmt-collapse" id="collapse-right" title="Collapse">&rsaquo;</button>
+      </div>
+      <div class="prop-body" id="prop-body"></div>
+    </aside>
+    <button class="panel-reopen right" id="reopen-right" title="Show Format panel">&lsaquo;</button>
+  </div>
+
+  <!-- ================= STATUS BAR ================= -->
+  <div class="statusbar" id="statusbar">
+    <span class="page-tab">Page-1</span>
+    <span id="sb-count">0 shapes / 0 links</span>
+    <span class="sb-div"></span>
+    <span id="sb-x">X: 0</span>
+    <span id="sb-y">Y: 0</span>
+    <span class="sb-div"></span>
+    <span id="sb-grid">Grid: ON</span>
+    <span id="sb-snap">Snap: ON</span>
+    <span class="sb-flex"></span>
+    <span class="sb-hint">Space/middle-drag to pan · wheel to zoom</span>
+    <span class="sb-div"></span>
+    <span id="sb-zoom">Zoom: 100%</span>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="context-menu" id="context-menu">
+  <div class="cm-item" data-cmd="editText">Edit</div>
+  <div class="cm-item" data-cmd="copy">Copy</div>
+  <div class="cm-item" data-cmd="duplicate">Duplicate</div>
+  <div class="cm-item" data-cmd="deleteSelection">Delete</div>
+  <div class="cm-sep"></div>
+  <div class="cm-item" data-cmd="bringFront">Bring to Front</div>
+  <div class="cm-item" data-cmd="sendBack">Send to Back</div>
+  <div class="cm-sep"></div>
+  <div class="cm-item" data-cmd="group">Group</div>
+  <div class="cm-item" data-cmd="ungroup">Ungroup</div>
+  <div class="cm-sep"></div>
+  <div class="cm-item" data-cmd="editPoints">Edit Points</div>
+  <div class="cm-item" data-cmd="saveCustomShape">Save as Custom Shape…</div>
+  <div class="cm-item" data-cmd="startConnector">Add Connector</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Modals -->
+<div class="modal" id="modal-shortcuts">
+  <div class="modal-box">
+    <div class="modal-head">Keyboard Shortcuts <button class="icon-btn modal-x">✕</button></div>
+    <div class="modal-body">
+      <table class="kt">
+        <tr><td>Ctrl+Z / Ctrl+Y</td><td>Undo / Redo</td></tr>
+        <tr><td>Ctrl+C / Ctrl+X / Ctrl+V</td><td>Copy / Cut / Paste</td></tr>
+        <tr><td>Ctrl+D</td><td>Duplicate</td></tr>
+        <tr><td>Ctrl+A</td><td>Select all</td></tr>
+        <tr><td>Delete / Backspace</td><td>Delete selection</td></tr>
+        <tr><td>Ctrl+S</td><td>Save to browser storage</td></tr>
+        <tr><td>Ctrl + / Ctrl -</td><td>Zoom in / out</td></tr>
+        <tr><td>Ctrl+0</td><td>Reset zoom</td></tr>
+        <tr><td>Arrow keys</td><td>Nudge (Shift = ×10)</td></tr>
+        <tr><td>Double-click node</td><td>Edit text</td></tr>
+        <tr><td>Space + drag / Middle drag</td><td>Pan canvas</td></tr>
+        <tr><td>Mouse wheel</td><td>Zoom</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-about">
+  <div class="modal-box">
+    <div class="modal-head">About <button class="icon-btn modal-x">✕</button></div>
+    <div class="modal-body">
+      <p><b>Diagram Editor</b> — a diagrams.net-style editor built with pure HTML5, CSS3,
+      vanilla JavaScript, jQuery and SVG. No frameworks, no diagram libraries.</p>
+      <p>Drag shapes from the left library, connect them, style them in the right panel,
+      and export to JSON / SVG / PNG. Your work is auto-saved to browser localStorage.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-prefs">
+  <div class="modal-box">
+    <div class="modal-head">Preferences <button class="icon-btn modal-x">✕</button></div>
+    <div class="modal-body">
+      <div class="pref-row">
+        <label>Grid size</label>
+        <select id="pref-gridsize">
+          <option value="10">10 px</option>
+          <option value="20" selected>20 px</option>
+          <option value="40">40 px</option>
+        </select>
+      </div>
+      <div class="pref-row">
+        <label><input type="checkbox" id="pref-grid" checked> Show grid</label>
+      </div>
+      <div class="pref-row">
+        <label><input type="checkbox" id="pref-snap" checked> Snap to grid</label>
+      </div>
+      <div class="pref-row">
+        <label>Default connector</label>
+        <select id="pref-conntype">
+          <option value="orthogonal" selected>Orthogonal</option>
+          <option value="straight">Straight</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-savecustom">
+  <div class="modal-box">
+    <div class="modal-head">Save as Custom Shape <button class="icon-btn modal-x">✕</button></div>
+    <div class="modal-body">
+      <div class="pref-row">
+        <label>Name</label>
+        <input type="text" id="savecustom-name" class="modal-input" placeholder="My Shape" autocomplete="off">
+      </div>
+      <div class="prop-hint">Saves this shape's outline, size and style as a reusable tile in the left library. It stays available in every diagram and is stored in this browser.</div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="mini wide" id="savecustom-cancel">Cancel</button>
+        <button class="mini wide primary" id="savecustom-save">Save Shape</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-newshape">
+  <div class="modal-box wide">
+    <div class="modal-head">New Shape <button class="icon-btn modal-x">✕</button></div>
+    <div class="modal-body">
+      <div class="ns-row">
+        <div class="ns-pad-wrap">
+          <svg id="ns-pad" viewBox="0 0 100 100"></svg>
+          <div class="prop-hint"><b>Click</b> the pad to add points · <b>drag</b> a point to move · <b>right-click</b> a point to delete · <span id="ns-count">0 points</span></div>
+        </div>
+        <div class="ns-side">
+          <div class="ns-l">Start from a template</div>
+          <div class="btn-row" id="ns-templates">
+            <button class="mini" data-tpl="triangle">Triangle</button>
+            <button class="mini" data-tpl="diamond">Diamond</button>
+            <button class="mini" data-tpl="pentagon">Pentagon</button>
+            <button class="mini" data-tpl="hexagon">Hexagon</button>
+            <button class="mini" data-tpl="chevron">Chevron</button>
+            <button class="mini" data-tpl="star">Star</button>
+          </div>
+          <div class="btn-row">
+            <button class="mini" id="ns-undo">Remove last point</button>
+            <button class="mini" id="ns-clear">Clear</button>
+          </div>
+          <div class="pref-row"><label>Name</label><input type="text" id="ns-name" class="modal-input" placeholder="My Shape" autocomplete="off"></div>
+          <div class="pref-row"><label>Fill</label><input type="color" id="ns-fill" value="#dae8fc"></div>
+          <div class="pref-row"><label>Line</label><input type="color" id="ns-stroke" value="#6c8ebf"></div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="mini wide" id="ns-cancel">Cancel</button>
+        <button class="mini wide primary" id="ns-save">Add to Library</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="file-open-json" accept=".json,.svg,.png,.html,application/json,image/svg+xml,image/png,text/html" style="display:none">
+
+<script src="js/vendor/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"><\/script>');</script>
+<script src="js/editor.js"></script>
+<script src="js/history.js"></script>
+<script src="js/shapes.js"></script>
+<script src="js/nodes.js"></script>
+<script src="js/selection.js"></script>
+<script src="js/resize.js"></script>
+<script src="js/connectors.js"></script>
+<script src="js/properties.js"></script>
+<script src="js/toolbar.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/export.js"></script>
+<script src="js/shapeeditor.js"></script>
+</body>
+</html>
