@@ -307,16 +307,34 @@
     });
   }
 
+  // remembered open/closed state of each library category (name -> true = open)
+  const CAT_KEY = 'diagramEditor.catOpen.v1';
+  function loadCatState() {
+    try { return JSON.parse(localStorage.getItem(CAT_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function saveCatState(s) {
+    try { localStorage.setItem(CAT_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
   App.buildShapePalette = function () {
     const $list = $('#shape-list').empty();
     const cats = App.paletteCategories.slice();
     if (App.customShapes && App.customShapes.length) {
       cats.push({ name: 'Custom', custom: true, items: App.customShapes.map(c => c.id) });
     }
-    cats.forEach(cat => {
+    const catState = loadCatState();
+    cats.forEach((cat, idx) => {
       const $cat = $('<div class="shape-cat"></div>');
+      // default: only the first 2 categories open; the rest collapsed (until the user chooses)
+      const pref = catState[cat.name];
+      const collapsed = (pref === undefined) ? (idx >= 2) : (pref === false);
+      if (collapsed) $cat.addClass('collapsed');
       $('<div class="shape-cat-head"><span class="caret">▾</span><span>' + cat.name + '</span></div>')
-        .appendTo($cat).on('click', function () { $cat.toggleClass('collapsed'); });
+        .appendTo($cat).on('click', function () {
+          $cat.toggleClass('collapsed');
+          catState[cat.name] = !$cat.hasClass('collapsed');
+          saveCatState(catState);
+        });
       const $grid = $('<div class="shape-grid"></div>').appendTo($cat);
       cat.items.forEach(type => {
         const label = App.shapeLabel(type);
