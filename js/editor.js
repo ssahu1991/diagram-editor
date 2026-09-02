@@ -220,8 +220,8 @@
     h.style.top = (cy + 18) + 'px';
   };
 
-  /* ---------- theme ---------- */
-  App.theme = 'light';
+  /* ---------- theme (dark by default) ---------- */
+  App.theme = 'dark';
   App.setTheme = function (theme, save) {
     App.theme = (theme === 'dark') ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', App.theme);
@@ -358,7 +358,7 @@
     App.initStorage();
 
     App.setTool('select');
-    App.setTheme(document.documentElement.getAttribute('data-theme') || 'light', false); // sync menu check
+    App.setTheme(document.documentElement.getAttribute('data-theme') || 'dark', false); // sync menu check
     App.applyGridSettings();
 
     const restored = App.loadDiagram();
