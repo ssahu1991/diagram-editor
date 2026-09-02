@@ -89,7 +89,7 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
+html,body{height:100%;width:100%;margin:0;padding:0;overflow:hidden}
 body{
   font:12.5px/1.45 var(--font);
   color:var(--text);
@@ -110,7 +110,14 @@ button{font-family:inherit;color:inherit}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
 
-#app{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg)}
+/* pin to every viewport edge so the editor always fills the whole window
+   (fixed + inset:0 sidesteps 100vh rounding gaps under Windows display scaling) */
+#app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  height:100vh;height:100dvh;
+  overflow:hidden;background:var(--bg);
+}
 
 /* ============ Menu bar ============ */
 .menubar{
