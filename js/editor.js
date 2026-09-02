@@ -119,6 +119,18 @@
     App.dom.gridDot.setAttribute('fill', color);
     App.dom.gridDot.style.display = dots ? '' : 'none';
 
+    // Changing only the stroke/fill *inside* a <pattern> doesn't always
+    // invalidate the rect that references it via fill="url(#grid-pattern)"
+    // — so on a theme switch the grid kept its old colour until the next
+    // pan/zoom. Re-point the consumer (with a forced reflow between) so it
+    // repaints with the new colour immediately.
+    const gr = App.dom.gridRect;
+    if (gr) {
+      gr.setAttribute('fill', 'none');
+      void gr.getBoundingClientRect();
+      gr.setAttribute('fill', 'url(#grid-pattern)');
+    }
+
     $('[data-cmd="toggleGrid"]').toggleClass('checked', s.gridEnabled);
     $('[data-cmd="toggleSnap"]').toggleClass('checked', s.snapEnabled);
     $('#tb-grid-toggle').toggleClass('active', s.gridEnabled);
