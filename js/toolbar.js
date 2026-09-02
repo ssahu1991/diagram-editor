@@ -177,6 +177,7 @@
     $('#pref-grid').prop('checked', App.settings.gridEnabled);
     $('#pref-snap').prop('checked', App.settings.snapEnabled);
     $('#pref-conntype').val(App.defaultEdgeType);
+    $('#pref-theme').val(App.theme);
     $('#modal-prefs').addClass('show');
   }
 
@@ -358,6 +359,7 @@
     $('#pref-grid').on('change', function () { App.settings.gridEnabled = this.checked; App.applyGridSettings(); });
     $('#pref-snap').on('change', function () { App.settings.snapEnabled = this.checked; App.applyGridSettings(); });
     $('#pref-conntype').on('change', function () { App.defaultEdgeType = this.value; });
+    $('#pref-theme').on('change', function () { App.setTheme(this.value); });
 
     /* file input */
     $('#file-open-json').on('change', function () {

@@ -108,10 +108,13 @@
 
     const sel = App.selectedEdges.indexOf(edge.id) >= 0;
     const st = edge.style;
+    // the factory-default connector colour flips light on a dark canvas
+    let strokeCol = st.stroke;
+    if (App.theme === 'dark' && /^#33373d$/i.test(strokeCol)) strokeCol = '#b9bec8';
     App.make('path', { class: 'edge-hit', d: d, fill: 'none', stroke: 'transparent', 'stroke-width': 14 }, g);
     const line = App.make('path', {
       class: 'edge-line', d: d, fill: 'none',
-      stroke: sel ? '#2b7de9' : st.stroke,
+      stroke: sel ? '#2b7de9' : strokeCol,
       'stroke-width': (st.strokeWidth || 2) + (sel ? 1 : 0),
       'stroke-dasharray': st.dashed ? '7 5' : null,
       'marker-end': st.arrowEnd ? 'url(#arrow)' : null,

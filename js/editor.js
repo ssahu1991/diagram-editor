@@ -100,12 +100,15 @@
     const s = App.settings;
     const g = Math.max(4, s.gridSize || 20);
     const dots = s.gridStyle === 'dots';
+    // the factory-default grid colour adapts to the theme; a user-picked colour is used as-is
+    const isDefault = /^#e8e8e8$/i.test(s.gridColor);
+    const color = (isDefault && App.theme === 'dark') ? '#33353c' : s.gridColor;
     App.dom.gridPattern.setAttribute('width', g);
     App.dom.gridPattern.setAttribute('height', g);
     App.dom.gridPath.setAttribute('d', 'M ' + g + ' 0 L 0 0 L 0 ' + g);
-    App.dom.gridPath.setAttribute('stroke', s.gridColor);
+    App.dom.gridPath.setAttribute('stroke', color);
     App.dom.gridPath.style.display = dots ? 'none' : '';
-    App.dom.gridDot.setAttribute('fill', s.gridColor);
+    App.dom.gridDot.setAttribute('fill', color);
     App.dom.gridDot.style.display = dots ? '' : 'none';
 
     $('[data-cmd="toggleGrid"]').toggleClass('checked', s.gridEnabled);
@@ -227,6 +230,8 @@
     document.documentElement.setAttribute('data-theme', App.theme);
     $('[data-cmd="toggleTheme"]').toggleClass('checked', App.theme === 'dark');
     if (save !== false) { try { localStorage.setItem('diagramEditor.theme', App.theme); } catch (e) {} }
+    if (App.dom && App.dom.gridPath) App.applyGridSettings();   // grid + edges follow the theme
+    if (App.renderAllEdges) App.renderAllEdges();
   };
 
   /* ---------- status bar ---------- */

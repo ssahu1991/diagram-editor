@@ -54,8 +54,8 @@
   --surface:#212226;
   --surface-2:#26282d;
   --surface-3:#31333a;
-  --canvas-bg:#161719;
-  --page:#ffffff;
+  --canvas-bg:#141518;
+  --page:#1e1f24;
 
   --border:#33353b;
   --border-strong:#43454e;
@@ -173,6 +173,11 @@ button{font-family:inherit;color:inherit}
 .tool-btn.active{background:var(--accent-soft);border-color:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-ring)}
 .tool-btn.danger:hover{background:var(--danger-soft);color:var(--danger)}
 .tool-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#tb-theme .ico-light{display:none}
+#tb-theme .ico-dark{display:block}
+:root[data-theme="dark"] #tb-theme .ico-light{display:block}
+:root[data-theme="dark"] #tb-theme .ico-dark{display:none}
+#tb-theme .ico-dark path{fill:currentColor;stroke:none}
 
 .tb-zoom{
   display:flex;align-items:center;flex:none;height:28px;margin-left:4px;
@@ -309,6 +314,8 @@ button{font-family:inherit;color:inherit}
 .guide{stroke:#f0508a;pointer-events:none;shape-rendering:crispEdges}
 .edge-label{font:11px var(--font);fill:#21242b;pointer-events:none}
 .edge-label-bg{fill:#fff;opacity:.92;pointer-events:none}
+:root[data-theme="dark"] .edge-label{fill:#e5e7eb}
+:root[data-theme="dark"] .edge-label-bg{fill:#1e1f24;opacity:.9}
 
 /* floating readout during resize / rotate / drag */
 #hud{

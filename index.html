@@ -135,6 +135,9 @@
         <svg viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14"/><path d="M2 6.7h14M2 11.3h14M6.7 2v14M11.3 2v14"/></svg></button>
       <button class="tool-btn" id="tb-snap-toggle" data-cmd="toggleSnap" title="Snap to Grid">
         <svg viewBox="0 0 18 18"><path d="M9 2v3M9 13v3M2 9h3M13 9h3"/><circle cx="9" cy="9" r="2.4"/></svg></button>
+      <button class="tool-btn" id="tb-theme" data-cmd="toggleTheme" title="Toggle light / dark theme">
+        <svg class="ico-dark" viewBox="0 0 18 18"><path d="M15 10.3A6.2 6.2 0 0 1 7.7 3 6.2 6.2 0 1 0 15 10.3z"/></svg>
+        <svg class="ico-light" viewBox="0 0 18 18"><circle cx="9" cy="9" r="3.3"/><path d="M9 1.6v2.1M9 14.3v2.1M1.6 9h2.1M14.3 9h2.1M3.9 3.9l1.5 1.5M12.6 12.6l1.5 1.5M3.9 14.1l1.5-1.5M12.6 5.4l1.5-1.5"/></svg></button>
     </div>
     <div class="tb-zoom">
       <button class="tool-btn" data-cmd="zoomOut" title="Zoom Out (Ctrl+-)">
@@ -297,6 +300,13 @@
         <select id="pref-conntype">
           <option value="orthogonal" selected>Orthogonal</option>
           <option value="straight">Straight</option>
+        </select>
+      </div>
+      <div class="pref-row">
+        <label>Theme</label>
+        <select id="pref-theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
         </select>
       </div>
     </div>
