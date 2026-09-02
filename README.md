@@ -1,66 +1,89 @@
 # Diagram Editor
 
-A professional **diagrams.net (draw.io)-style** diagram editor built with **only**
-HTML5, CSS3, vanilla JavaScript, jQuery and SVG. No React / Vue / Angular /
-TypeScript, no Fabric / Konva / React-Flow or any diagram library.
+A **diagrams.net (draw.io)-style** diagram editor built with **only** HTML5, CSS3, vanilla
+JavaScript, jQuery and SVG — no React / Vue / Angular / TypeScript, no Fabric / Konva /
+React-Flow or any diagram library.
 
-## Run it
+**Run it:** open **`index.html`** in a modern browser. jQuery is vendored
+(`js/vendor/jquery.min.js`) so it works fully offline; a CDN copy is the fallback.
 
-Just open **`index.html`** in a modern browser (Chrome, Edge, Firefox).
-jQuery is vendored in `js/vendor/jquery.min.js`, so it works fully offline;
-if that file is missing it falls back to a CDN copy.
+**Live repo:** https://github.com/ssahu1991/diagram-editor
+
+---
+
+## Highlights
+
+| Area | What it does |
+|---|---|
+| **Layout** | Top menu · toolbar · collapsible shape library · SVG canvas · Format panel (Style / Text / Arrange) · status bar |
+| **Themes** | Light **and dark** (default). Toolbar sun/moon button, `View ▸ Dark Mode`, or Preferences. The dark canvas keeps shapes readable — connectors & grid flip light. Choice persists. |
+| **Shapes** | General · Arrows · Flowchart · SVG-path **Icons** · your own **polygon** shapes — **all declared in one file, `js/shapes.js`** |
+| **Editing** | Select · multi-select (Shift/Ctrl-click or drag box) · move · 8-handle resize · rotate · delete · `V`/`C`/`T` tool keys |
+| **Smart guides** | Dragging a shape snaps its edges/centre to nearby shapes and draws alignment lines |
+| **Text** | Double-click / `F2` / `Enter` to edit; wraps to shape width (stored text keeps your line breaks) |
+| **Connectors** | Drag from a connection point or the Connector tool · straight / orthogonal · start/end arrowheads · dashed · colour · **double-click for a label** · auto-reroute when shapes move |
+| **Format panel** | Preset swatches · fill / line / opacity / rounded · font, B/I/U, colour, align · size / position / angle · order · align **& distribute** (3+) · group · **collapsible sections** |
+| **Dynamic shapes** | **Type picker** swaps a shape into any other type · **Edit Points** drags polygon vertices to reshape the outline · **Save as Custom Shape** · **New Shape** editor (draw on a pad) |
+| **View** | Zoom (wheel to cursor / buttons / `Ctrl ±0`) · pan (Space-drag or middle-drag) · fit · reset · **infinite grid** (lines / dots · size · colour) · snap |
+| **History / clipboard** | Undo / redo · copy / cut / paste / duplicate · **Alt-drag to duplicate** |
+| **HUD** | Live `W × H` while resizing, angle while rotating, `X, Y` while dragging |
+| **Persistence** | Auto-saved to `localStorage`; survives refresh |
+| **Save As / Open** | JSON · **Editable Bitmap (.png)** (diagram JSON in a `tEXt` chunk) · **Editable Vector (.svg)** (`<svg data-diagram-json>`) · **HTML File** (inlined SVG + JSON). `File ▸ Open` re-opens any of them. |
+| **Responsive** | Panels become slide-in drawers under 1024 px; toolbar & canvas stay usable |
+| **a11y** | Icon buttons carry `aria-label`s; `prefers-reduced-motion` respected; keyboard focus rings |
+
+---
 
 ## File structure
 
 ```
 diagram-editor/
 ├── index.html
-├── css/
-│   └── editor.css
-├── js/
-│   ├── editor.js       core state, coord math, viewport, zoom/pan, bootstrap
-│   ├── history.js      snapshot undo / redo
-│   ├── nodes.js        shape library, geometry, rendering, text editing
-│   ├── selection.js    selection model, dragging, rubber-band, overlay handles
-│   ├── resize.js       8-handle resize + rotation (rotation-aware)
-│   ├── connectors.js   connection points, edges, orthogonal/straight routing
-│   ├── properties.js   right-hand properties panel
-│   ├── toolbar.js      menus, toolbar, context menu, keyboard, clipboard,
-│   │                   layer order, align, grouping
-│   ├── storage.js      localStorage persistence (survives refresh)
-│   ├── export.js       JSON / SVG / PNG export + JSON import
-│   └── vendor/jquery.min.js
-└── assets/icons/
+├── css/editor.css
+└── js/
+    ├── shapes.js       ← the ONE file to edit to add/remove shapes & icons
+    ├── editor.js       core state, coord math, zoom/pan, infinite grid, theme, HUD
+    ├── history.js      snapshot undo / redo
+    ├── nodes.js        node data, rendering, text editing, shape palette
+    ├── selection.js    selection, dragging, rubber-band, smart guides, overlay
+    ├── resize.js       8-handle resize + rotation + vertex editing
+    ├── connectors.js   connection points, edges, routing, labels
+    ├── properties.js   Format panel (Style / Text / Arrange)
+    ├── toolbar.js      menus, toolbar, context menu, keyboard, commands, align/distribute
+    ├── storage.js      localStorage persistence + custom-shape library
+    ├── export.js       JSON / PNG / SVG / HTML export + format-detecting import
+    ├── shapeeditor.js  the "New Shape" modal (draw a polygon)
+    └── vendor/jquery.min.js
 ```
 
-## Features
+---
 
-| Area | What works |
-|------|------------|
-| **Layout** | Top menu, toolbar, collapsible left shape library, SVG canvas, right properties panel, status bar |
-| **Shapes** | General / Arrows / Flowchart libraries — drag onto canvas or double-click a tile |
-| **Dynamic shapes** | **Type picker** (Style tab) swaps a shape into any other type, keeping text/size/style · **Edit Points** shows draggable vertex handles on polygon shapes (diamond, triangle, hexagon, star, I/O, block arrows) so you can reshape the outline itself · **Save as Custom Shape** captures the current outline + size + style as a reusable tile in a persistent *Custom* library (stored in localStorage, also travels inside exported JSON) |
-| **New Shape editor** | `Shapes ▸ +` (or `Extras ▸ New Shape…`) opens a pad — click to drop points, drag to move, right-click to delete, or start from a template (triangle / diamond / pentagon / hexagon / chevron / star) — name it, pick fill/line, **Add to Library**. Saved as a normalised free `polygon` custom shape that behaves like every built-in one (resize, rotate, connect, re-reshape via Edit Points). |
-| **`js/shapes.js`** | **The one file to edit to add/remove library shapes & icons.** Each entry is `{ key, label, category, width, height, style }` plus either `type:'path'` + `viewBox` + `path` (an SVG icon) or `type:'polygon'` + `points` (fractions of w/h — also vertex-editable). Everything else — palette tile, Type picker, resize/rotate/connect/style, JSON — is wired up automatically; no other file changes. |
-| **Editing** | Select, multi-select (Ctrl+click / rubber-band), move, 8-handle resize, rotate, delete, double-click to edit text (Enter save / Esc cancel / Shift+Enter newline) |
-| **Connectors** | Drag from a connection point or use the Connector tool; straight / orthogonal, start/end arrowheads, dashed, colour, width; edges follow nodes automatically |
-| **Format panel** | diagrams.net-style right panel with **Style / Text / Arrange** tabs (plus a Diagram/grid panel when nothing is selected): preset colour swatches, fill, line, opacity, rounded; font + bold/italic/underline/colour/align; size, position, angle, order & align buttons |
-| **Text** | Wraps to the shape width automatically (stored text keeps your own line breaks) |
-| **View** | Zoom (wheel / buttons / menu), pan (Space+drag or middle-drag), reset, fit to screen, grid (10/20/40 px), snap to grid |
-| **History** | Undo / Redo for create, move, resize, rotate, text, style, edge create/delete |
-| **Clipboard** | Copy / Cut / Paste / Duplicate — pasted nodes get new IDs and keep internal connections |
-| **Arrange** | Bring to front / send to back / forward / backward, align 6 ways, group / ungroup |
-| **Persistence** | Auto-saved to `localStorage`; `saveDiagram()` / `loadDiagram()` / `deleteDiagram()` |
-| **Save As / Export** | **JSON File** · **Editable Bitmap Image (.png)** — PNG with the diagram JSON stored in a `tEXt` chunk · **Editable Vector Image (.svg)** — SVG with the JSON on the root `<svg data-diagram-json>` · **HTML File (.html)** — self-contained page with the inlined SVG + JSON. All three render as normal images/pages anywhere, and re-open losslessly. |
-| **Open** | `File ▸ Open Diagram…` accepts `.json`, `.svg`, `.png` or `.html` and pulls the embedded diagram back out (custom shapes travel with the file) |
-| **Context menu** | Right-click: Edit, Copy, Duplicate, Delete, Bring to Front / Send to Back, Group / Ungroup, Add Connector |
-| **Responsive** | Panels overlay / collapse on narrow screens; canvas + toolbar stay usable |
+## Adding a shape or icon — edit `js/shapes.js` only
 
-## Keyboard shortcuts
+Add an object to `App.SHAPES` (top of the file). Two kinds:
 
-`Ctrl+Z/Y` undo/redo · `Ctrl+C/X/V` copy/cut/paste · `Ctrl+D` duplicate ·
-`Ctrl+A` select all · `Del` delete · `Ctrl+S` save · `Ctrl +/-` zoom ·
-`Ctrl+0` reset zoom · arrows nudge (Shift ×10) · `Space+drag` pan · wheel zoom.
+```js
+// SVG-path ICON
+{
+  key: 'server', label: 'Server', category: 'Icons', type: 'path',
+  width: 80, height: 100, viewBox: [64, 80],
+  style: { fill: '#eef1f5' },
+  path: 'M4,4 h56 v72 h-56 z M10,14 h44 M10,26 h44'
+}
+
+// POLYGON shape (also reshapeable via "Edit Points")
+{
+  key: 'trapezoid', label: 'Trapezoid', category: 'My Shapes', type: 'polygon',
+  width: 130, height: 70,
+  points: [[0.22,0],[0.78,0],[1,1],[0,1]]   // fractions of width/height
+}
+```
+
+The palette tile, Type picker, resize/rotate/connect/style, and JSON export/import are
+all wired up automatically. Delete the object to remove the shape. The built-in shape
+tables (sizes, labels, categories) and geometry live further down the same file.
+
+---
 
 ## Data model
 
@@ -73,12 +96,13 @@ node = {
            textAlign, verticalAlign, textColor }
 }
 
-customShape = { id, name, baseType, width, height, points, style }   // reusable library shape
-
 edge = {
-  id, source, target, sourceAnchor, targetAnchor, type /* straight | orthogonal */,
+  id, source, target, sourceAnchor, targetAnchor,
+  type /* straight | orthogonal */, text /* label */,
   style: { stroke, strokeWidth, dashed, arrowStart, arrowEnd }
 }
 
-document = { nodes: [], edges: [], settings: { gridEnabled, gridSize, snapEnabled, zoom } }
+customShape = { id, name, baseType, width, height, points, style }   // reusable library shape
+
+document = { nodes: [], edges: [], customShapes: [], settings: { … } }
 ```

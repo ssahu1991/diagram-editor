@@ -100,6 +100,27 @@
     App.pushHistory();
   }
 
+  // evenly space 3+ selected shapes so the gaps between their centres are equal
+  function distribute(axis) {
+    const list = App.selectedNodes.map(id => App.getNode(id)).filter(Boolean);
+    if (list.length < 3) { App.toast('Select 3 or more shapes to distribute'); return; }
+    const k = axis === 'h' ? 'x' : 'y';
+    const sz = axis === 'h' ? 'width' : 'height';
+    list.sort((a, b) => (a[k] + a[sz] / 2) - (b[k] + b[sz] / 2));
+    const first = list[0][k] + list[0][sz] / 2;
+    const last = list[list.length - 1][k] + list[list.length - 1][sz] / 2;
+    const step = (last - first) / (list.length - 1);
+    list.forEach((n, i) => {
+      if (i === 0 || i === list.length - 1) return;
+      n[k] = (first + step * i) - n[sz] / 2;
+      App.updateNodeTransform(n);
+      App.refreshConnectedEdges(n.id);
+    });
+    App.updateSelectionOverlay();
+    App.updateProperties();
+    App.pushHistory();
+  }
+
   /* ---------------- grouping ---------------- */
   function group() {
     if (App.selectedNodes.length < 2) return;
@@ -222,6 +243,8 @@
     alignTop: () => align('top'),
     alignMiddle: () => align('middle'),
     alignBottom: () => align('bottom'),
+    distributeH: () => distribute('h'),
+    distributeV: () => distribute('v'),
     group: group,
     ungroup: ungroup,
 
@@ -371,6 +394,11 @@
     $('#sb-grid').attr('title', 'Toggle grid').on('click', toggleGrid);
     $('#sb-snap').attr('title', 'Toggle snap').on('click', toggleSnap);
     $('#sb-zoom').attr('title', 'Reset zoom').on('click', function () { App.resetZoom(); });
+
+    /* a11y: give every icon-only button an accessible name from its tooltip */
+    $('.tool-btn[title], .icon-btn[title], .panel-reopen[title]').each(function () {
+      if (!this.getAttribute('aria-label')) this.setAttribute('aria-label', this.getAttribute('title'));
+    });
 
     /* keyboard */
     $(document).on('keydown', function (e) {

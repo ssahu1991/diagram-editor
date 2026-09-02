@@ -286,6 +286,18 @@ button{font-family:inherit;color:inherit}
 /* ============ Canvas ============ */
 .canvas-wrap{flex:1;min-width:0;position:relative;overflow:hidden;background:var(--canvas-bg)}
 #canvas{width:100%;height:100%;display:block;background:var(--canvas-bg);cursor:default}
+
+.canvas-empty{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;pointer-events:none;user-select:none;color:var(--text-3);text-align:center;
+}
+.canvas-empty svg{width:110px;height:70px;opacity:.45;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linejoin:round}
+.canvas-empty .ce-title{font-size:15px;font-weight:600;color:var(--text-2);letter-spacing:.2px}
+.canvas-empty .ce-sub{font-size:12px}
+.canvas-empty kbd{
+  font:11px/1 var(--font);background:var(--surface-3);border:1px solid var(--border-strong);
+  border-bottom-width:2px;border-radius:4px;padding:1px 6px;margin:0 1px;color:var(--text-2)
+}
 #canvas.space-pan{cursor:grab}
 #canvas.space-pan:active{cursor:grabbing}
 #canvas[data-tool="text"]{cursor:text}
@@ -478,8 +490,10 @@ button{font-family:inherit;color:inherit}
 .modal-body p{margin:0 0 10px;color:var(--text-2);line-height:1.55}
 .modal-body b{color:var(--text)}
 .kt{width:100%;border-collapse:collapse}
-.kt td{padding:6px 8px;border-bottom:1px solid var(--border)}
-.kt td:first-child{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--accent);white-space:nowrap}
+.kt td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+.kt tr:last-child td{border-bottom:none}
+.kt td:first-child{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--accent);white-space:nowrap;padding-right:16px}
+.modal-body code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:var(--surface-3);border-radius:3px;padding:1px 4px;color:var(--text)}
 .pref-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .pref-row label{min-width:120px}
 .pref-row select{padding:5px 8px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text)}

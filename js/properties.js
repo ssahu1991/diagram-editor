@@ -327,11 +327,14 @@
       '<div class="btn-row">' +
         cb('bringForward', 'Forward', 'wide') + cb('sendBackward', 'Backward', 'wide') +
       '</div>') +
-    (count > 1 ? section('Align',
+    (count > 1 ? section('Align' + (count > 2 ? ' & Distribute' : ''),
       '<div class="btn-row">' +
         cb('alignLeft', '&#8676;') + cb('alignCenterH', '&#8596;') + cb('alignRight', '&#8677;') +
         cb('alignTop', '&#8673;') + cb('alignMiddle', '&#8597;') + cb('alignBottom', '&#8675;') +
       '</div>' +
+      (count > 2 ? '<div class="btn-row">' +
+        cb('distributeH', 'Distribute &#8596;', 'wide') + cb('distributeV', 'Distribute &#8597;', 'wide') +
+      '</div>' : '') +
       '<div class="btn-row">' + cb('group', 'Group', 'wide') + cb('ungroup', 'Ungroup', 'wide') + '</div>')
       : section('Group', '<div class="btn-row">' + cb('ungroup', 'Ungroup', 'wide') + '</div>'));
   }

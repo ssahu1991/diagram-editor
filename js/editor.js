@@ -242,6 +242,8 @@
     $('#sb-snap').text('Snap: ' + (App.settings.snapEnabled ? 'ON' : 'OFF'));
     $('#sb-count').text(App.nodes.length + ' shape' + (App.nodes.length === 1 ? '' : 's') +
       ' / ' + App.edges.length + ' link' + (App.edges.length === 1 ? '' : 's'));
+    const ce = document.getElementById('canvas-empty');
+    if (ce) ce.hidden = (App.nodes.length + App.edges.length) > 0;
   };
 
   /* ---------- full render ---------- */
@@ -320,17 +322,6 @@
     $(window).on('resize.nav', function () { App.updateViewport(); });
   }
 
-  /* ---------- optional demo seed ---------- */
-  App.seedDemo = function () {
-    const a = App.makeNodeData('terminator', 160, 120); a.text = 'Start';
-    const b = App.makeNodeData('process', 150, 250); b.text = 'Collect Data';
-    const c = App.makeNodeData('decision', 155, 390); c.text = 'Valid?'; c.width = 130; c.height = 90;
-    const d = App.makeNodeData('process', 400, 400); d.text = 'Assign';
-    App.nodes.push(a, b, c, d);
-    App.createEdge(a.id, b.id, 'bottom', 'top');
-    App.createEdge(b.id, c.id, 'bottom', 'top');
-    App.createEdge(c.id, d.id, 'right', 'left');
-  };
 
   /* ---------- bootstrap ---------- */
   App.init = function () {
@@ -367,7 +358,7 @@
     App.applyGridSettings();
 
     const restored = App.loadDiagram();
-    if (!restored) { App.seedDemo(); App.settings.zoom = 1; }
+    if (!restored) App.settings.zoom = 1;   // fresh start: blank canvas at 100%
 
     App.render();
     App.updateProperties();
