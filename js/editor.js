@@ -169,6 +169,33 @@
     App.updateViewport();
   };
 
+  // true when the OS / browser asks for less motion — every animation checks this
+  App.reducedMotion = function () {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  };
+
+  // smoothly glide the viewport to a target pan/zoom (used by Fit / Reset)
+  App.tweenView = function (px, py, z, ms) {
+    if (App._viewRAF) { cancelAnimationFrame(App._viewRAF); App._viewRAF = 0; }
+    const s = App.settings;
+    if (App.reducedMotion() || ms === 0) {
+      s.panX = px; s.panY = py; s.zoom = z; App.updateViewport(); return;
+    }
+    const fromX = s.panX, fromY = s.panY, fromZ = s.zoom;
+    const dur = ms || 260, t0 = performance.now();
+    const ease = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2); // easeInOutCubic
+    const step = function (now) {
+      const k = Math.min(1, (now - t0) / dur), e = ease(k);
+      s.panX = fromX + (px - fromX) * e;
+      s.panY = fromY + (py - fromY) * e;
+      s.zoom = fromZ + (z - fromZ) * e;
+      App.updateViewport();
+      App._viewRAF = (k < 1) ? requestAnimationFrame(step) : 0;
+    };
+    App._viewRAF = requestAnimationFrame(step);
+  };
+
   // bounding box of all nodes (world coords); a default region when the canvas is empty
   App.contentBox = function () {
     if (!App.nodes.length) return { x: 0, y: 0, w: 920, h: 640 };
@@ -190,9 +217,12 @@
     App.updateViewport();
   };
 
-  App.resetZoom = function () {
-    App.settings.zoom = 1;
-    App.centerView();
+  App.resetZoom = function (animate) {
+    const box = App.contentBox(), z = 1;
+    const r = App.dom.svg.getBoundingClientRect();
+    const px = (r.width - box.w * z) / 2 - box.x * z;
+    const py = (r.height - box.h * z) / 2 - box.y * z;
+    App.tweenView(px, py, z, animate === false ? 0 : undefined);
   };
 
   App.fitToScreen = function () {
@@ -206,10 +236,9 @@
     minX -= pad; minY -= pad; maxX += pad; maxY += pad;
     const r = App.dom.svg.getBoundingClientRect();
     const z = Math.min(r.width / (maxX - minX), r.height / (maxY - minY), 2);
-    App.settings.zoom = z;
-    App.settings.panX = (r.width - (maxX - minX) * z) / 2 - minX * z;
-    App.settings.panY = (r.height - (maxY - minY) * z) / 2 - minY * z;
-    App.updateViewport();
+    const px = (r.width - (maxX - minX) * z) / 2 - minX * z;
+    const py = (r.height - (maxY - minY) * z) / 2 - minY * z;
+    App.tweenView(px, py, z);
   };
 
   /* ---------- floating HUD (size / angle / position readout) ---------- */

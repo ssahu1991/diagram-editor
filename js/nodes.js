@@ -108,7 +108,13 @@
     n.x = App.snap(wx - n.width / 2);
     n.y = App.snap(wy - n.height / 2);
     App.nodes.push(n);
-    App.renderNode(n);
+    const g = App.renderNode(n);
+    if (g && !App.reducedMotion()) {
+      g.classList.add('node-enter');
+      g.addEventListener('animationend', function h() {
+        g.classList.remove('node-enter'); g.removeEventListener('animationend', h);
+      });
+    }
     if (doSelect !== false) {
       App.select([n.id]);
       App.updateProperties();
@@ -207,6 +213,21 @@
   App.renderAllNodes = function () {
     App.dom.layerNodes.textContent = '';
     App.nodes.forEach(App.renderNode);
+  };
+
+  // leave a fading clone of each doomed shape behind while the real ones are removed
+  App.flyOutNodes = function (ids) {
+    if (App.reducedMotion() || !ids || !ids.length) return;
+    ids.forEach(function (id) {
+      const g = App.dom.layerNodes.querySelector('g.node[data-id="' + id + '"]');
+      if (!g) return;
+      const ghost = g.cloneNode(true);
+      ghost.removeAttribute('data-id');
+      ghost.classList.add('node-leave');
+      ghost.style.pointerEvents = 'none';
+      App.dom.layerTmp.appendChild(ghost);
+      setTimeout(function () { ghost.remove(); }, 220);
+    });
   };
 
   /* ---------------- double-click text editor ---------------- */

@@ -339,6 +339,18 @@ button{font-family:inherit;color:inherit}
 :root[data-theme="dark"] .edge-label{fill:#e5e7eb}
 :root[data-theme="dark"] .edge-label-bg{fill:#1e1f24;opacity:.9}
 
+/* ---- motion: shape add / remove, connector flow, idle empty-state ---- */
+/* SVG <g> nodes carry a transform attribute, so these touch opacity only */
+.node.node-enter{animation:nodeIn .17s ease-out}
+.node-leave{animation:nodeOut .2s ease-in forwards;pointer-events:none}
+@keyframes nodeIn{from{opacity:0}to{opacity:1}}
+@keyframes nodeOut{from{opacity:1}to{opacity:0}}
+.edge-line.flow{animation:edgeFlow .6s linear infinite}
+@keyframes edgeFlow{to{stroke-dashoffset:-14}}
+.canvas-empty svg{animation:ceFloat 3.4s ease-in-out infinite}
+@keyframes ceFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.tool-btn:active,.icon-btn:active,.mini:active,.swatch:active{transform:scale(.93)}
+
 /* floating readout during resize / rotate / drag */
 #hud{
   position:fixed;z-index:850;display:none;pointer-events:none;

@@ -11,7 +11,7 @@
   }
 
   App.edgeDefaultStyle = function () {
-    return { stroke: '#33373d', strokeWidth: 2, dashed: false, arrowStart: false, arrowEnd: true };
+    return { stroke: '#33373d', strokeWidth: 2, dashed: false, arrowStart: false, arrowEnd: true, flow: false };
   };
 
   /* ---------------- anchors ---------------- */
@@ -112,11 +112,12 @@
     let strokeCol = st.stroke;
     if (App.theme === 'dark' && /^#33373d$/i.test(strokeCol)) strokeCol = '#b9bec8';
     App.make('path', { class: 'edge-hit', d: d, fill: 'none', stroke: 'transparent', 'stroke-width': 14 }, g);
+    const flow = !!st.flow && !App.reducedMotion();
     const line = App.make('path', {
-      class: 'edge-line', d: d, fill: 'none',
+      class: 'edge-line' + (flow ? ' flow' : ''), d: d, fill: 'none',
       stroke: sel ? '#2b7de9' : strokeCol,
       'stroke-width': (st.strokeWidth || 2) + (sel ? 1 : 0),
-      'stroke-dasharray': st.dashed ? '7 5' : null,
+      'stroke-dasharray': st.dashed ? '7 5' : (flow ? '8 6' : null),
       'marker-end': st.arrowEnd ? 'url(#arrow)' : null,
       'marker-start': st.arrowStart ? 'url(#arrow)' : null
     }, g);

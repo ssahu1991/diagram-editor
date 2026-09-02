@@ -42,6 +42,7 @@
     if (!App.selectedNodes.length && !App.selectedEdges.length) return;
     const ids = {}; App.selectedNodes.forEach(id => ids[id] = 1);
     const eids = {}; App.selectedEdges.forEach(id => eids[id] = 1);
+    if (App.flyOutNodes) App.flyOutNodes(App.selectedNodes);
     App.edges = App.edges.filter(e => !ids[e.source] && !ids[e.target] && !eids[e.id]);
     App.nodes = App.nodes.filter(n => !ids[n.id]);
     App.clearSelection();

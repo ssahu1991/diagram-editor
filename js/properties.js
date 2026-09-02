@@ -363,7 +363,9 @@
           '<input type="number" id="e-sw" min="0.5" step="0.5" value="' + s.strokeWidth + '" style="flex:0 0 54px">') +
       row('<label>Style</label><select id="e-dash">' +
         '<option value="solid" ' + (s.dashed ? '' : 'selected') + '>Solid</option>' +
-        '<option value="dashed" ' + (s.dashed ? 'selected' : '') + '>Dashed</option></select>')) +
+        '<option value="dashed" ' + (s.dashed ? 'selected' : '') + '>Dashed</option></select>') +
+      row('<label>Flow</label><button class="mini ' + (s.flow ? 'on' : '') + '" id="e-flow">' +
+          (s.flow ? 'Animated' : 'Off') + '</button>')) +
     section('Arrows',
       '<div class="btn-row">' +
         tb('arr', 'start', 'Start &#8592;', s.arrowStart) +
@@ -377,6 +379,7 @@
     $('#e-stroke').on('input', function () { ed.style.stroke = this.value; redraw(); }).on('change', commit);
     $('#e-sw').on('input', function () { ed.style.strokeWidth = Math.max(0.5, +this.value || 2); redraw(); }).on('change', commit);
     $('#e-dash').on('change', function () { ed.style.dashed = this.value === 'dashed'; redraw(); commit(); });
+    $('#e-flow').on('click', function () { ed.style.flow = !ed.style.flow; redraw(); commit(); App.updateProperties(); });
     $('#prop-body .btn-row [data-arr]').on('click', function () {
       const k = $(this).data('arr') === 'start' ? 'arrowStart' : 'arrowEnd';
       ed.style[k] = !ed.style[k]; redraw(); commit(); App.updateProperties();
