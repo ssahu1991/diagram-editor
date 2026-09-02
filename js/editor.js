@@ -100,12 +100,15 @@
     const s = App.settings;
     const g = Math.max(4, s.gridSize || 20);
     const dots = s.gridStyle === 'dots';
-    // the factory-default grid colour adapts to the theme; a user-picked colour is used as-is
-    // the factory-default grid colour maps to a clearly-visible dark-mode grey;
-    // treat the previous dark default as "still default" so old saves adapt too
-    const isDefault = /^#(e8e8e8|3e424b)$/i.test(s.gridColor);
-    const color = (isDefault && App.theme === 'dark') ? '#4a4f5b'
-                : (isDefault && App.theme === 'light') ? '#e0e2e6'
+    // the factory-default grid colour adapts to the theme so the grid stays
+    // clearly legible on both the white and the dark page; a colour the user
+    // picked in the Diagram panel is always used exactly as chosen.
+    // every value we've ever shipped as a default counts as "still default"
+    // so diagrams saved earlier pick up the current, more visible greys.
+    const DEFAULTS = ['#e8e8e8', '#e0e2e6', '#c9ced7', '#3e424b', '#4a4f5b', '#525863'];
+    const isDefault = DEFAULTS.indexOf(String(s.gridColor || '').toLowerCase()) >= 0;
+    const color = (isDefault && App.theme === 'dark') ? '#525863'
+                : (isDefault && App.theme === 'light') ? '#c9ced7'
                 : s.gridColor;
     App.dom.gridPattern.setAttribute('width', g);
     App.dom.gridPattern.setAttribute('height', g);
