@@ -8,6 +8,8 @@
   --surface:#ffffff;
   --surface-2:#f7f8fa;
   --surface-3:#eef0f3;
+  --menubar-bg:#ffffff;
+  --menubar-fg:#21242b;
   --canvas-bg:#eceef1;
   --page:#ffffff;
 
@@ -54,6 +56,8 @@
   --surface:#212226;
   --surface-2:#26282d;
   --surface-3:#31333a;
+  --menubar-bg:#141519;
+  --menubar-fg:#c9cdd4;
   --canvas-bg:#141518;
   --page:#1e1f24;
 
@@ -110,9 +114,12 @@ button{font-family:inherit;color:inherit}
 .menubar{
   flex:none;height:var(--h-menu);
   display:flex;align-items:stretch;
-  background:var(--surface);border-bottom:1px solid var(--border);
+  background:var(--menubar-bg);color:var(--menubar-fg);
+  border-bottom:1px solid var(--border);
   padding-left:8px;position:relative;z-index:200;user-select:none;
 }
+:root[data-theme="dark"] .menubar{border-bottom-color:#000}
+.menubar .brand span{color:var(--menubar-fg)}
 .brand{
   display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;
   color:var(--accent);padding:0 16px 0 6px;letter-spacing:.2px;
