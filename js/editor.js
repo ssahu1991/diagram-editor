@@ -101,8 +101,12 @@
     const g = Math.max(4, s.gridSize || 20);
     const dots = s.gridStyle === 'dots';
     // the factory-default grid colour adapts to the theme; a user-picked colour is used as-is
-    const isDefault = /^#e8e8e8$/i.test(s.gridColor);
-    const color = (isDefault && App.theme === 'dark') ? '#3e424b' : s.gridColor;
+    // the factory-default grid colour maps to a clearly-visible dark-mode grey;
+    // treat the previous dark default as "still default" so old saves adapt too
+    const isDefault = /^#(e8e8e8|3e424b)$/i.test(s.gridColor);
+    const color = (isDefault && App.theme === 'dark') ? '#4a4f5b'
+                : (isDefault && App.theme === 'light') ? '#e0e2e6'
+                : s.gridColor;
     App.dom.gridPattern.setAttribute('width', g);
     App.dom.gridPattern.setAttribute('height', g);
     App.dom.gridPath.setAttribute('d', 'M ' + g + ' 0 L 0 0 L 0 ' + g);
