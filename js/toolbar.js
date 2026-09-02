@@ -207,6 +207,7 @@
     fit: () => App.fitToScreen(),
     toggleGrid: toggleGrid,
     toggleSnap: toggleSnap,
+    toggleTheme: () => App.setTheme(App.theme === 'dark' ? 'light' : 'dark'),
     fullscreen: fullscreen,
 
     bringFront: () => reorder('front'),

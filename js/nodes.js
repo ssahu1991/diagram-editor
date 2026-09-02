@@ -274,11 +274,11 @@
     const isIcon = !!(App.shapeTypes[et] && App.shapeTypes[et].path);
     if (App.shapeTypes[et] && App.shapeTypes[et].textPos === 'below') n.height = 16;
     n.style = Object.assign({}, n.style, {
-      strokeWidth: isIcon ? 0 : 1.3,
-      fill: et === 'text' ? 'none' : (isIcon ? '#5b6472' : '#ffffff'),
-      stroke: isIcon ? 'none' : '#1a1a1a'
+      strokeWidth: isIcon ? 0 : 1.4,
+      fill: isIcon ? '#7b8290' : 'none',          // outline-only regular shapes; grey icons
+      stroke: isIcon ? 'none' : 'currentColor'    // currentColor is themed via CSS (.shape-tile svg.thumb)
     });
-    if (et === 'text') { App.make('text', { x: 15, y: 15, 'text-anchor': 'middle', 'font-size': 16, 'font-family': 'Georgia, serif', fill: '#1a1a1a' }, svg).textContent = 'A'; return svg; }
+    if (et === 'text') { App.make('text', { x: 15, y: 15, 'text-anchor': 'middle', 'font-size': 16, 'font-family': 'Georgia, serif', fill: 'currentColor' }, svg).textContent = 'A'; return svg; }
     App.appendShapeGeometry(svg, n);
     return svg;
   };

@@ -44,6 +44,17 @@
   }
 
   App._propTab = 'style';
+  App._secCollapsed = {};
+
+  // remember which Format-panel sections the user has collapsed, and re-apply
+  // after every rebuild (headers are keyed by their title, e.g. "Fill", "Line")
+  function secKey(h) { return h.textContent.split('·')[0].trim(); }
+  function applySecState() {
+    document.querySelectorAll('#prop-body .prop-section').forEach(function (sec) {
+      const h = sec.querySelector('.prop-h');
+      if (h) sec.classList.toggle('sec-collapsed', !!App._secCollapsed[secKey(h)]);
+    });
+  }
 
   App.initProperties = function () {
     $('.fmt-tab').on('click', function () {
@@ -51,6 +62,10 @@
       $('.fmt-tab').removeClass('active');
       $(this).addClass('active');
       App.updateProperties();
+    });
+    $('#prop-body').on('click', '.prop-h', function () {
+      const sec = this.closest('.prop-section');
+      if (sec) App._secCollapsed[secKey(this)] = sec.classList.toggle('sec-collapsed');
     });
     App.updateProperties();
   };
@@ -64,24 +79,24 @@
       $rp.addClass('nosel');
       $b.html(diagramHTML());
       bindDiagram();
-      return;
-    }
-    $rp.removeClass('nosel');
-
-    if (App.selectedNodes.length) {
-      const n = App.getNode(App.selectedNodes[App.selectedNodes.length - 1]);
-      if (!n) return;
-      const count = App.selectedNodes.length;
-      if (tab === 'text') { $b.html(textTab(n, count)); bindText(n); }
-      else if (tab === 'arrange') { $b.html(arrangeTab(n, count)); bindArrange(n, count); }
-      else { $b.html(styleTab(n, count)); bindStyle(n); }
     } else {
-      const ed = App.getEdge(App.selectedEdges[0]);
-      if (!ed) return;
-      if (tab === 'text') $b.html(section('Text', '<div class="prop-hint">Connectors have no text label in this build.</div>'));
-      else if (tab === 'arrange') { $b.html(edgeArrange()); $('#prop-body [data-cmd]').on('click', function () { App.run($(this).data('cmd')); }); }
-      else { $b.html(edgeStyle(ed)); bindEdge(ed); }
+      $rp.removeClass('nosel');
+      if (App.selectedNodes.length) {
+        const n = App.getNode(App.selectedNodes[App.selectedNodes.length - 1]);
+        if (!n) return;
+        const count = App.selectedNodes.length;
+        if (tab === 'text') { $b.html(textTab(n, count)); bindText(n); }
+        else if (tab === 'arrange') { $b.html(arrangeTab(n, count)); bindArrange(n, count); }
+        else { $b.html(styleTab(n, count)); bindStyle(n); }
+      } else {
+        const ed = App.getEdge(App.selectedEdges[0]);
+        if (!ed) return;
+        if (tab === 'text') $b.html(section('Text', '<div class="prop-hint">Connectors have no text label in this build.</div>'));
+        else if (tab === 'arrange') { $b.html(edgeArrange()); $('#prop-body [data-cmd]').on('click', function () { App.run($(this).data('cmd')); }); }
+        else { $b.html(edgeStyle(ed)); bindEdge(ed); }
+      }
     }
+    applySecState();
   };
 
   /* ================= NODE · STYLE ================= */

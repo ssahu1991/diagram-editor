@@ -209,6 +209,15 @@
     App.updateViewport();
   };
 
+  /* ---------- theme ---------- */
+  App.theme = 'light';
+  App.setTheme = function (theme, save) {
+    App.theme = (theme === 'dark') ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', App.theme);
+    $('[data-cmd="toggleTheme"]').toggleClass('checked', App.theme === 'dark');
+    if (save !== false) { try { localStorage.setItem('diagramEditor.theme', App.theme); } catch (e) {} }
+  };
+
   /* ---------- status bar ---------- */
   App.updateStatusBar = function () {
     $('#sb-zoom').text('Zoom: ' + Math.round(App.settings.zoom * 100) + '%');
@@ -338,6 +347,7 @@
     App.initStorage();
 
     App.setTool('select');
+    App.setTheme(document.documentElement.getAttribute('data-theme') || 'light', false); // sync menu check
     App.applyGridSettings();
 
     const restored = App.loadDiagram();

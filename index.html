@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diagram Editor</title>
 <link rel="stylesheet" href="css/editor.css">
+<script>try{var _t=localStorage.getItem('diagramEditor.theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
 <body>
 <div id="app">
@@ -53,6 +54,7 @@
         <div class="mi-sep"></div>
         <div class="mi check" data-cmd="toggleGrid">Grid</div>
         <div class="mi check" data-cmd="toggleSnap">Snap to Grid</div>
+        <div class="mi check" data-cmd="toggleTheme">Dark Mode</div>
         <div class="mi-sep"></div>
         <div class="mi" data-cmd="fullscreen">Full Screen<span class="mi-key">F11</span></div>
       </div>
