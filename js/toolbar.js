@@ -301,6 +301,7 @@
       $('#left-panel, #right-panel').removeClass('collapsed');
       $('#reopen-left, #reopen-right').removeClass('show');
     }
+    if (App.reflowCanvas) App.reflowCanvas();
   };
 
   /* ---------------- init ---------------- */
@@ -328,10 +329,11 @@
     $('#zoom-pill').on('click', function () { App.resetZoom(); });
 
     /* panel collapse */
-    $('#collapse-left').on('click', () => { $('#left-panel').addClass('collapsed'); $('#reopen-left').addClass('show'); });
-    $('#reopen-left').on('click', () => { $('#left-panel').removeClass('collapsed'); if (!App._compact) $('#reopen-left').removeClass('show'); });
-    $('#collapse-right').on('click', () => { $('#right-panel').addClass('collapsed'); $('#reopen-right').addClass('show'); });
-    $('#reopen-right').on('click', () => { $('#right-panel').removeClass('collapsed'); if (!App._compact) $('#reopen-right').removeClass('show'); });
+    const reflow = () => { if (App.reflowCanvas) App.reflowCanvas(); };
+    $('#collapse-left').on('click', () => { $('#left-panel').addClass('collapsed'); $('#reopen-left').addClass('show'); reflow(); });
+    $('#reopen-left').on('click', () => { $('#left-panel').removeClass('collapsed'); if (!App._compact) $('#reopen-left').removeClass('show'); reflow(); });
+    $('#collapse-right').on('click', () => { $('#right-panel').addClass('collapsed'); $('#reopen-right').addClass('show'); reflow(); });
+    $('#reopen-right').on('click', () => { $('#right-panel').removeClass('collapsed'); if (!App._compact) $('#reopen-right').removeClass('show'); reflow(); });
     $(window).on('resize', App.applyResponsive);
     App.applyResponsive();
 

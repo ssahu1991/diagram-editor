@@ -156,6 +156,19 @@
     if (App.updateSelectionOverlay) App.updateSelectionOverlay();
   };
 
+  // a side panel slides open/closed without firing a window resize, so the
+  // canvas widens but the infinite grid/page rects still cover the old box —
+  // re-sync the viewport every frame for the length of the panel transition
+  App.reflowCanvas = function (ms) {
+    if (App._reflowRAF) cancelAnimationFrame(App._reflowRAF);
+    const t0 = performance.now(), dur = ms || 260;
+    const tick = function () {
+      App.updateViewport();
+      App._reflowRAF = (performance.now() - t0 < dur) ? requestAnimationFrame(tick) : 0;
+    };
+    App._reflowRAF = requestAnimationFrame(tick);
+  };
+
   App.setZoom = function (z, cx, cy) {
     const s = App.settings;
     z = Math.min(4, Math.max(0.2, z));
