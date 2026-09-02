@@ -105,10 +105,11 @@
     // picked in the Diagram panel is always used exactly as chosen.
     // every value we've ever shipped as a default counts as "still default"
     // so diagrams saved earlier pick up the current, more visible greys.
-    const DEFAULTS = ['#e8e8e8', '#e0e2e6', '#c9ced7', '#3e424b', '#4a4f5b', '#525863'];
+    const DEFAULTS = ['#e8e8e8', '#e0e2e6', '#c9ced7', '#dbdfe4',
+                      '#3e424b', '#4a4f5b', '#525863', '#3f434c'];
     const isDefault = DEFAULTS.indexOf(String(s.gridColor || '').toLowerCase()) >= 0;
-    const color = (isDefault && App.theme === 'dark') ? '#525863'
-                : (isDefault && App.theme === 'light') ? '#c9ced7'
+    const color = (isDefault && App.theme === 'dark') ? '#3f434c'
+                : (isDefault && App.theme === 'light') ? '#dbdfe4'
                 : s.gridColor;
     App.dom.gridPattern.setAttribute('width', g);
     App.dom.gridPattern.setAttribute('height', g);
